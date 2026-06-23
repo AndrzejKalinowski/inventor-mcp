@@ -1,0 +1,26 @@
+{
+  "manifest_version": "0.3",
+  "name": "autodesk-inventor-mcp",
+  "display_name": "Autodesk Inventor MCP",
+  "version": "2.1.0",
+  "description": "Bridge to Autodesk Inventor via COM automation: sketches, extrudes, revolves, fillets/chamfers, parameters, assemblies.",
+  "author": {
+    "name": ""
+  },
+  "server": {
+    "type": "python",
+    "entry_point": "inventor_mcp.py",
+    "mcp_config": {
+      "command": "<ABSOLUTE_PATH_TO_REPO>\\.venv\\Scripts\\python.exe",
+      "args": ["<ABSOLUTE_PATH_TO_REPO>\\inventor_mcp.py"],
+      "env": {}
+    }
+  },
+  "tools_generated": true,
+  "compatibility": {
+    "platforms": ["win32"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}

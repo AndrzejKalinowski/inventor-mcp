@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Inventor documents and project artifacts (personal/local CAD work)
+*.ipt
+*.iam
+*.idw
+*.dwg
+OldVersions/
+models/
+tests/
+
+# Build artifacts / screenshots / scratch
+*.mcpb
+*.png
+*.jpg
+*.jpeg
+
+# Local Claude Desktop Extension manifest (contains your absolute local path)
+# Use inventor-mcp-ext/manifest.example.json as a template instead.
+inventor-mcp-ext/manifest.json
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Internal agent/session artifacts (not part of the project)
+.claude/
