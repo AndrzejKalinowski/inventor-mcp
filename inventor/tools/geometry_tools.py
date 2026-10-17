@@ -67,6 +67,7 @@ def face_summary(face) -> dict:
         cy = CastTo(geo, "Cylinder")
         entry["radius_mm"] = cm_to_mm(cy.Radius)
         entry["axis"] = _vector_xyz(cy.AxisVector)
+        entry["base_point_mm"] = _point_mm(cy.BasePoint)
     return entry
 
 
@@ -142,7 +143,8 @@ def register(mcp):
     @inventor_tool
     async def inventor_list_faces(body_index: int = 1, doc: str | None = None) -> list[dict]:
         """Bir govdenin tum yuzeylerini listeler: entity_id, yuzey turu, alan (mm^2) ve
-        turune ozgu geometri (duzlem icin normal+kok nokta, silindir icin yaricap+eksen)."""
+        turune ozgu geometri (duzlem icin normal+kok nokta, silindir icin yaricap+eksen+
+        eksen uzerindeki base_point_mm)."""
         app = get_app()
         document = get_document(app, doc)
         comp_def = get_part_component_def(document)

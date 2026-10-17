@@ -17,6 +17,7 @@ from inventor.tools import (
     export_tools,
     feature_tools,
     geometry_tools,
+    joint_tools,
     parameter_tools,
     property_tools,
     sketch_tools,
@@ -32,6 +33,7 @@ parameter_tools.register(mcp)
 property_tools.register(mcp)
 geometry_tools.register(mcp)
 assembly_tools.register(mcp)
+joint_tools.register(mcp)
 drawing_tools.register(mcp)
 appearance_tools.register(mcp)
 export_tools.register(mcp)
