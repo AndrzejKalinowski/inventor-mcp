@@ -13,12 +13,13 @@ An [MCP](https://modelcontextprotocol.io) server that bridges Claude (or any MCP
 - **Properties** — iProperties and mass properties (volume, mass, center of gravity, etc.).
 - **Geometry inspection** — list bodies, faces, edges, and bounding boxes.
 - **Assemblies** — place/ground/position components, add and inspect mate constraints, rectangular/circular component patterns, bill of materials.
+- **Joints** — rigid, rotational, slider, cylindrical, planar, and ball assembly joints with optional angular/linear limits; list, delete, and drive joints to test motion.
 - **Drawings** — sheets, base/projected views, dimensions, parts lists, title block fields.
 - **Appearances** — list and apply visual styles/materials.
 - **Document & app control** — new/open/save/close documents, active document switching, status checks.
 - **Visualization** — zoom-to-fit and screenshot capture for visual verification.
 
-Tool implementations live under `inventor/tools/`, organized by domain (`sketch_tools.py`, `feature_tools.py`, `assembly_tools.py`, `drawing_tools.py`, `geometry_tools.py`, `parameter_tools.py`, `property_tools.py`, `appearance_tools.py`, `export_tools.py`, `view_tools.py`, `app_tools.py`).
+Tool implementations live under `inventor/tools/`, organized by domain (`sketch_tools.py`, `feature_tools.py`, `assembly_tools.py`, `joint_tools.py`, `drawing_tools.py`, `geometry_tools.py`, `parameter_tools.py`, `property_tools.py`, `appearance_tools.py`, `export_tools.py`, `view_tools.py`, `app_tools.py`).
 
 ## Requirements
 
@@ -63,6 +64,25 @@ Add an entry to your MCP client's configuration pointing at the venv interpreter
 ```
 
 A ready-to-customize Claude Desktop Extension (`.mcpb`) manifest template is provided at `inventor-mcp-ext/manifest.example.json` — copy it to `inventor-mcp-ext/manifest.json`, replace the `<ABSOLUTE_PATH_TO_REPO>` placeholders with your local checkout path, then package or load it.
+
+### Example: joints
+
+Joints connect a face or edge on one occurrence to a face or edge on another. Get `entity_id`s from `inventor_assembly_list_occurrence_faces` / `inventor_assembly_list_occurrence_edges`. Inventor moves the occurrence of `entity_one` onto `entity_two`, so pass the moving part first and the grounded part second.
+
+```text
+inventor_assembly_list_occurrence_edges(occurrence="pin:1")
+inventor_assembly_list_occurrence_edges(occurrence="plate:1")
+
+inventor_assembly_add_joint(
+    joint_type="rotational",
+    entity_one="Assembly1:_asm_pin:1_edges:edge0",    # circular edge of the pin
+    entity_two="Assembly1:_asm_plate:1_edges:edge4",  # circular edge of the hole
+    angle_limits_deg=[0, 90],
+)
+inventor_assembly_drive_joint(name="Rotational:1", angle_deg=45)
+```
+
+`point_one`/`point_two` (`start`, `mid`, `end`, `center`) pick the joint origin: a point on an edge, a point on the axis of a cylindrical/conical face, or the center of a planar face (`center` only). Angular limits and `angle_deg` apply to rotational and cylindrical joints; linear limits and `linear_mm` apply to slider and cylindrical joints. A joint driven outside its limits reports `health: "invalid_limits"`.
 
 ## Architecture notes
 
