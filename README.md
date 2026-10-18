@@ -46,7 +46,17 @@ The server communicates over stdio, as expected by MCP clients such as Claude De
 .venv\Scripts\python.exe inventor_mcp.py
 ```
 
-It will connect to a running Inventor instance, or launch one if none is open.
+Starting the server does **not** start Inventor. The server connects on the first tool call, and only to an Inventor that is already running. If Inventor isn't running, tools return `Inventor is not running — start Inventor and try again`. Start Inventor and call the tool again.
+
+To have the server launch Inventor when it isn't running (the old behaviour), set the `INVENTOR_MCP_AUTOLAUNCH` environment variable to `1`, for example in the Claude Desktop config:
+
+```json
+"inventor": {
+  "command": "C:\\path\\to\\repo\\.venv\\Scripts\\python.exe",
+  "args": ["C:\\path\\to\\repo\\inventor_mcp.py"],
+  "env": { "INVENTOR_MCP_AUTOLAUNCH": "1" }
+}
+```
 
 ### Using with Claude Desktop / Cowork
 
@@ -97,7 +107,7 @@ Occurrences whose names match `name_filter` (regex, default `screw|pin|washer`) 
 
 ## Architecture notes
 
-- `inventor/connection.py` manages the connection to `Inventor.Application`, re-initializing COM per call to stay safe across the multi-threaded calls an MCP server can receive.
+- `inventor/connection.py` manages the connection to `Inventor.Application`, re-initializing COM per call to stay safe across the multi-threaded calls an MCP server can receive. At import it only loads Inventor's type library (`gencache.EnsureModule`, which does not start Inventor) so that enum constants are available. The application itself is attached with `GetActiveObject` inside tool calls.
 - `inventor/registry.py` tracks sketch entities and other COM object references by an opaque `entity_id` string, so tool calls can refer back to objects created in earlier calls without re-querying geometry.
 - `inventor/helpers.py` and `inventor/units.py` provide shared geometry helpers and millimeter/centimeter unit conversions (Inventor's API is internally in centimeters).
 - Several feature/sketch collections in Inventor's COM type library are wrapped with `win32com.client.dynamic.Dispatch` rather than the early-bound gencache proxy, working around a `gen_py` cache staleness issue observed with certain collections (e.g. `CoilFeatures`, `SweepFeatures`, `LoftFeatures`, `CombineFeatures`).
